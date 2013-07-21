@@ -9,6 +9,12 @@
  */
 
 define(function(require, exports, module) {
+    
+/*global winTourGuide tourControlsDialog winTourDesc winTourButtonStart
+        winTourButtonClose winTourButtonDone trFiles txtConsoleInput 
+        btnTourPlay btnTourStepForward btnTourStepBack winTourText
+        barIdeStatus expandedDbg btnZenFullscreen textTourDesc self
+        */
 
 var ext = require("core/ext");
 var ide = require("core/ide");
@@ -51,6 +57,7 @@ module.exports = ext.register("ext/guidedtour/guidedtour", {
 
     init: function(amlNode) {
         this.initTour();
+        /*jshint evil: true */
         eval(strTour);
 
         this.overlay   = document.createElement("div");
@@ -268,6 +275,7 @@ module.exports = ext.register("ext/guidedtour/guidedtour", {
             }
             else if (step.div !== undefined) {
                 if (step.div.indexOf("navbar") >= 0) {
+                    /*jshint evil: true*/
                     _self.currentEl = eval(step.div);
                 }
                 else if (step.div == "expandedDbg") {
@@ -388,8 +396,8 @@ module.exports = ext.register("ext/guidedtour/guidedtour", {
         this.hlElement.style.display = "block";
         this.hlElement.style.border = "solid 2px #bee82c";
 
+        var zIndex;
         if (this.currentEl.$ext) {
-            var zIndex;
             var pNode = this.currentEl;
             if (pNode) {
                 while (pNode && pNode.tagName != "body" && (!zIndex || zIndex <= 9998)) {
@@ -402,7 +410,7 @@ module.exports = ext.register("ext/guidedtour/guidedtour", {
             }
         }
         else {
-            zIndex = this.currentEl.style && parseInt(this.currentEl.style.zIndex || 9997) + 1;
+            zIndex = this.currentEl.style && parseInt(this.currentEl.style.zIndex || 9997, 10) + 1;
         }
 
         this.hlElement.style.zIndex = zIndex;
@@ -411,23 +419,28 @@ module.exports = ext.register("ext/guidedtour/guidedtour", {
     getElementPosition: function(el){
         if(!el)
             return [0, 0, 0, 0];
-
+        
+        var width;
+        var height;
+        
         var elExt = el.$ext;
+        
         if (elExt === undefined) {
-            if (el.parentNode !== undefined)
+            if (el.parentNode !== undefined) {
                 elExt = el.parentNode;
-            else
+            } else {
                 elExt = el[0];
+            }       
+            width = elExt.offsetWidth;
+            height = elExt.offsetHeight;
+        } else {
+            width = el.getWidth();
+            height = el.getHeight();
+        }
+        
+        var pos = apf.getAbsolutePosition(elExt);
 
-            var pos = apf.getAbsolutePosition(elExt);
-            return [pos[0], pos[1], elExt.offsetWidth, elExt.offsetHeight];
-        }
-        else {
-            var pos = apf.getAbsolutePosition(elExt);
-            var w = el.getWidth();
-            var h = el.getHeight();
-            return [pos[0], pos[1], w, h];
-        }
+        return [pos[0], pos[1], width, height];
     },
 
     closeTG: function() {

@@ -304,4 +304,4 @@ this.tour = {
         pos: "right",
         time: 4
     }]
-}
+};
